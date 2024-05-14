@@ -1,16 +1,26 @@
-import { Button, Center, HStack, Text, useColorModeValue } from "@chakra-ui/react"
+import {
+  Button,
+  Center,
+  HStack,
+  Icon,
+  Text,
+  Tooltip,
+  useColorModeValue,
+} from "@chakra-ui/react"
 import Card from "components/common/Card"
 import Layout from "components/common/Layout"
 import GuessTheGuild from "components/guess-the-guild/GuessTheGuild"
 import PairTheGuild from "components/guess-the-guild/PairTheGuild"
 import SelectGameLevel from "components/guess-the-guild/SelectGameLevel"
 import useLocalStorage from "hooks/useLocalStorage"
+import { Star } from "phosphor-react"
 import { useState } from "react"
 import useSWRImmutable from "swr/immutable"
 import { GameLevel, GameMode, GuildBase } from "types"
 
 const Page = (): JSX.Element => {
   const bgColor = useColorModeValue("var(--chakra-colors-gray-800)", "#3f4044")
+
   const [gameInProgress, setGameInProgress] = useState<boolean>(false)
 
   const getRandomGameMode = (): GameMode =>
@@ -32,6 +42,7 @@ const Page = (): JSX.Element => {
   const onFinishedGuessTheGuildRound = (pointsReceived: number) => {
     if (pointsReceived === 0 && record < points) setRecord(points)
     setPoints(pointsReceived > 0 ? points + pointsReceived : pointsReceived)
+
     setGameMode(getRandomGameMode())
   }
   const { data } = useSWRImmutable<GuildBase[]>(
@@ -55,8 +66,8 @@ const Page = (): JSX.Element => {
         maxWidth="container.sm"
       >
         <HStack justifyContent="space-between">
-          <Text as="span" fontWeight="bold">
-            Record: {record}
+          <Text as="span" fontWeight="bold" color="white">
+            Record: {record > 0 && record}
           </Text>
           <SelectGameLevel
             selected={selectedLevel}
@@ -71,12 +82,23 @@ const Page = (): JSX.Element => {
           px={{ base: 5, md: 6 }}
           bg="#37373a"
         >
-          <Text as="span" fontSize="lg" fontWeight="bold" textAlign="center">
+          <Text
+            as="span"
+            fontSize="lg"
+            fontWeight="bold"
+            textAlign="center"
+            color="white"
+          >
             {title}
           </Text>
           {gameInProgress && (
-            <Text as="span" fontWeight="bold" textAlign="center" my="5">
-              Current points: {points} {points > record && "(new high scrore!)"}
+            <Text as="span" textAlign="center" my="5" color="white">
+              Current points: {points}
+              {points > record && (
+                <Tooltip label="New high score!">
+                  <Icon as={Star} boxSize="1.1em" weight="bold" />
+                </Tooltip>
+              )}
             </Text>
           )}
           {gameInProgress && (
@@ -90,6 +112,7 @@ const Page = (): JSX.Element => {
               ) : (
                 <PairTheGuild
                   guildData={data}
+                  onLevelSelectDisable={setLevelSelectDisable}
                   finishedRound={onFinishedGuessTheGuildRound}
                 ></PairTheGuild>
               )}
@@ -98,7 +121,7 @@ const Page = (): JSX.Element => {
 
           {!gameInProgress && (
             <Center mt="6">
-              <Button colorScheme="green" onClick={onStartGame} isDisabled={!data}>
+              <Button isLoading={!data} colorScheme="green" onClick={onStartGame}>
                 Start game
               </Button>
             </Center>

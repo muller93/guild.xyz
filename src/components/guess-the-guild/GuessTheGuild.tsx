@@ -72,7 +72,14 @@ const GuessTheGuild = ({
       <Center mt="6">
         <GuildLogo size="85px" imageUrl={randomGuild.imageUrl} />
       </Center>
-      <Text as="span" fontWeight="bold" mt="3" mb="6" textAlign="center">
+      <Text
+        as="span"
+        fontWeight="bold"
+        mt="3"
+        mb="6"
+        textAlign="center"
+        color="white"
+      >
         {correctGuildName}
       </Text>
       {possibleGuilds.map((guild) => (

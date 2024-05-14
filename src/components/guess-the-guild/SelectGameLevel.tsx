@@ -1,4 +1,4 @@
-import { Box, Button, HStack, useColorModeValue } from "@chakra-ui/react"
+import { Box, Button, HStack, Text, useColorModeValue } from "@chakra-ui/react"
 import { motion } from "framer-motion"
 import { GameLevel } from "types"
 
@@ -14,6 +14,8 @@ const SelectGameLevel = ({
   onSelect,
 }: Props): JSX.Element => {
   const selectedBg = useColorModeValue("white", "gray.600")
+  const selectedButtonColor = useColorModeValue("gray.600", "")
+  const hoverColor = useColorModeValue("", "transparent")
   const selectedShadow = "0 0.5px 2px 0 rgba(0, 0, 0, 0.2)"
   const MotionBox = motion(Box)
   const gameLevels: GameLevel[] = [GameLevel.Easy, GameLevel.Medium, GameLevel.Hard]
@@ -30,9 +32,12 @@ const SelectGameLevel = ({
               borderRadius="lg"
               onClick={() => onSelect(level)}
               zIndex={1}
-              {...(selected === level && { _hover: { bg: "transparent" } })}
+              bgColor={selectedButtonColor}
+              {...(selected === level && { _hover: { bg: hoverColor } })}
             >
-              {level === 100 ? "Easy" : level === 500 ? "Medium" : "Hard"}
+              <Text color="white">
+                {level === 100 ? "Easy" : level === 500 ? "Medium" : "Hard"}
+              </Text>
             </Button>
             {selected === level ? (
               <MotionBox
