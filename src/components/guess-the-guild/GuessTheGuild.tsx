@@ -31,7 +31,7 @@ const GuessTheGuild = ({
           .slice(0, 3),
         randomGuild,
       ].sort(() => Math.random() - Math.random()),
-    [guildData, randomGuild]
+    [randomGuild]
   )
 
   const onSubmit = (guildId: number) => {
@@ -50,21 +50,23 @@ const GuessTheGuild = ({
   }
 
   const onStartNewGame = () => {
-    setRandomGuild(guildData[Math.floor(Math.random() * guildData.length)])
-    setCorrectGuildName("???")
     setCorrectAnswerId(null)
-    setWrongAnswerId(null)
-    setShowResult(false)
     onLevelSelectDisable(true)
+    resetSettings()
     finishedRound(0)
   }
 
   const nextRound = () => {
     setRandomGuild(guildData[Math.floor(Math.random() * guildData.length)])
+    resetSettings()
+    finishedRound(1)
+  }
+
+  const resetSettings = () => {
+    setRandomGuild(guildData[Math.floor(Math.random() * guildData.length)])
     setCorrectGuildName("???")
     setWrongAnswerId(null)
     setShowResult(false)
-    finishedRound(1)
   }
 
   return (
@@ -80,7 +82,7 @@ const GuessTheGuild = ({
         textAlign="center"
         color="white"
       >
-        {correctGuildName}
+        {!wrongAnswerId ? correctGuildName : "Game over! Try again!"}
       </Text>
       {possibleGuilds.map((guild) => (
         <Card

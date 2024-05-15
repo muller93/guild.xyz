@@ -61,17 +61,19 @@ const PairTheGuild = ({
 
   const nextRound = () => {
     finishedRound(2)
-    setSubmitted(false)
-    setDraggedGuilds([])
-    guildData = { ...guildData }
+    resetSettings()
   }
 
   const onStartNewGame = () => {
     finishedRound(0)
+    resetSettings()
+    onLevelSelectDisable(true)
+  }
+
+  const resetSettings = () => {
     setSubmitted(false)
     setDraggedGuilds([])
     guildData = { ...guildData }
-    onLevelSelectDisable(true)
   }
 
   const onClear = () => setDraggedGuilds([])
@@ -107,22 +109,30 @@ const PairTheGuild = ({
           gap="6"
           height={"80px"}
         >
-          {guildLogos
-            .filter(
-              (guild) =>
-                !draggedGuilds.some(
-                  (draggedGuild) => draggedGuild.dragabbleGuildId === guild.id
+          {!submitted ? (
+            <>
+              {guildLogos
+                .filter(
+                  (guild) =>
+                    !draggedGuilds.some(
+                      (draggedGuild) => draggedGuild.dragabbleGuildId === guild.id
+                    )
                 )
-            )
-            .map((guild) => (
-              <GuildLogo
-                draggable
-                onDragStart={(e) => handleDrag(guild)}
-                key={guild.id}
-                size="4rem"
-                imageUrl={guild.imageUrl}
-              />
-            ))}
+                .map((guild) => (
+                  <GuildLogo
+                    draggable
+                    onDragStart={(e) => handleDrag(guild)}
+                    key={guild.id}
+                    size="4rem"
+                    imageUrl={guild.imageUrl}
+                  />
+                ))}
+            </>
+          ) : (
+            <Text as="span" fontSize="lg" fontWeight="bold" color="white">
+              {isCorrect ? "Correct! Click next button!" : "Game over! Try again!"}
+            </Text>
+          )}
         </HStack>
       </Center>
       {guildDetails.map((guild) => (
