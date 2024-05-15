@@ -18,18 +18,17 @@ import { useEffect, useState } from "react"
 import useSWRImmutable from "swr/immutable"
 import { GameLevel, GameMode, GuildBase } from "types"
 
+const possibleGameModes: GameMode[] = [GameMode.GuessTheGuild, GameMode.PairTheGuild]
+const getRandomGameMode = (): GameMode =>
+  possibleGameModes[Math.floor(Math.random() * possibleGameModes.length)]
+
 const Page = (): JSX.Element => {
   const bgColor = useColorModeValue("var(--chakra-colors-gray-800)", "#3f4044")
 
-  const [gameInProgress, setGameInProgress] = useState<boolean>(false)
-
-  const getRandomGameMode = (): GameMode =>
-    possibleGameModes[Math.floor(Math.random() * possibleGameModes.length)]
-  const possibleGameModes: GameMode[] = ["GuessTheGuild", "PairTheGuild"]
+  const [isGameInProgress, setIsGameInProgress] = useState<boolean>(false)
   const [gameMode, setGameMode] = useState<GameMode>(getRandomGameMode())
-
   const [selectedLevel, setSelectedLevel] = useState<GameLevel>(GameLevel.Easy)
-  const [levelSelectDisable, setLevelSelectDisable] = useState<boolean>()
+  const [isLevelSelectDisable, setIsLevelSelectDisable] = useState<boolean>(false)
   const [storedRecord, setStoredRecord] = useLocalStorage(
     "guess-the-guild-record",
     0
@@ -37,8 +36,10 @@ const Page = (): JSX.Element => {
   const [record, setRecord] = useState<number>(0)
   const [points, setPoints] = useState<number>(0)
 
-  const title: string = gameInProgress
-    ? gameMode === "GuessTheGuild"
+  const isGameModeGuessTheGuild: boolean = gameMode === GameMode.GuessTheGuild
+
+  const title: string = isGameInProgress
+    ? isGameModeGuessTheGuild
       ? "Guess the guild by the logo"
       : "Pair the logos to their guilds"
     : "Choose a difficulty level and press the button"
@@ -46,9 +47,9 @@ const Page = (): JSX.Element => {
   const onFinishedGuessTheGuildRound = (pointsReceived: number) => {
     if (pointsReceived === 0 && record < points) setStoredRecord(points)
     setPoints(pointsReceived > 0 ? points + pointsReceived : pointsReceived)
-
     setGameMode(getRandomGameMode())
   }
+
   const { data } = useSWRImmutable<GuildBase[]>(
     `/v2/guilds?order=FEATURED&limit=${selectedLevel}`
   )
@@ -58,8 +59,8 @@ const Page = (): JSX.Element => {
   }, [storedRecord])
 
   const onStartGame = () => {
-    setGameInProgress(true)
-    setLevelSelectDisable(true)
+    setIsGameInProgress(true)
+    setIsLevelSelectDisable(true)
   }
 
   return (
@@ -79,7 +80,7 @@ const Page = (): JSX.Element => {
           </Text>
           <SelectGameLevel
             selected={selectedLevel}
-            levelSelectDisable={levelSelectDisable}
+            isLevelSelectDisable={isLevelSelectDisable}
             onSelect={setSelectedLevel}
           ></SelectGameLevel>
         </HStack>
@@ -99,7 +100,7 @@ const Page = (): JSX.Element => {
           >
             {title}
           </Text>
-          {gameInProgress && (
+          {isGameInProgress && (
             <Text
               as="span"
               textAlign="center"
@@ -144,25 +145,25 @@ const Page = (): JSX.Element => {
               )}
             </Text>
           )}
-          {gameInProgress && (
+          {isGameInProgress && (
             <>
-              {gameMode === "GuessTheGuild" ? (
+              {isGameModeGuessTheGuild ? (
                 <GuessTheGuild
                   guildData={data}
-                  onLevelSelectDisable={setLevelSelectDisable}
+                  onLevelSelectDisable={setIsLevelSelectDisable}
                   finishedRound={onFinishedGuessTheGuildRound}
                 ></GuessTheGuild>
               ) : (
                 <PairTheGuild
                   guildData={data}
-                  onLevelSelectDisable={setLevelSelectDisable}
+                  onLevelSelectDisable={setIsLevelSelectDisable}
                   finishedRound={onFinishedGuessTheGuildRound}
                 ></PairTheGuild>
               )}
             </>
           )}
 
-          {!gameInProgress && (
+          {!isGameInProgress && (
             <Center mt="6">
               <Button isLoading={!data} colorScheme="green" onClick={onStartGame}>
                 Start game
