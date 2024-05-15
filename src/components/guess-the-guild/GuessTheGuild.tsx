@@ -5,7 +5,7 @@ import { GuildBase } from "types"
 
 type Props = {
   guildData: GuildBase[]
-  onLevelSelectDisable: (levelSelectDisable: boolean) => void
+  onLevelSelectDisable: (isLevelSelectDisable: boolean) => void
   finishedRound: (points: number) => void
 }
 
@@ -14,10 +14,9 @@ const GuessTheGuild = ({
   onLevelSelectDisable,
   finishedRound,
 }: Props): JSX.Element => {
-  const [showResult, setShowResult] = useState<boolean>(false)
+  const [isShowResult, setIsShowResult] = useState<boolean>(false)
   const [correctAnswerId, setCorrectAnswerId] = useState<number>()
   const [wrongAnswerId, setWrongAnswerId] = useState<number>()
-  const [correctGuildName, setCorrectGuildName] = useState<string>("???")
   const [randomGuild, setRandomGuild] = useState<GuildBase>(
     guildData[Math.floor(Math.random() * guildData.length)]
   )
@@ -35,17 +34,15 @@ const GuessTheGuild = ({
   )
 
   const onSubmit = (guildId: number) => {
-    if (!showResult) {
+    if (!isShowResult) {
       if (guildId === randomGuild.id) {
         setCorrectAnswerId(guildId)
-        setCorrectGuildName(guildData?.find((guild) => guild.id === guildId).name)
       } else {
         setCorrectAnswerId(randomGuild.id)
         setWrongAnswerId(guildId)
-        setCorrectGuildName("???")
         onLevelSelectDisable(false)
       }
-      setShowResult(true)
+      setIsShowResult(true)
     }
   }
 
@@ -64,9 +61,15 @@ const GuessTheGuild = ({
 
   const resetSettings = () => {
     setRandomGuild(guildData[Math.floor(Math.random() * guildData.length)])
-    setCorrectGuildName("???")
     setWrongAnswerId(null)
-    setShowResult(false)
+    setIsShowResult(false)
+  }
+
+  const getCorrectName = () => {
+    if (!isShowResult) {
+      return "???"
+    }
+    return !wrongAnswerId ? randomGuild.name : "Game over! Try again!"
   }
 
   return (
@@ -82,7 +85,7 @@ const GuessTheGuild = ({
         textAlign="center"
         color="white"
       >
-        {!wrongAnswerId ? correctGuildName : "Game over! Try again!"}
+        {getCorrectName()}
       </Text>
       {possibleGuilds?.map((guild) => (
         <Card
@@ -110,7 +113,7 @@ const GuessTheGuild = ({
         </Card>
       ))}
       <Center mt="4" height={"45px"}>
-        {showResult &&
+        {isShowResult &&
           (wrongAnswerId ? (
             <Button colorScheme="green" onClick={() => onStartNewGame()}>
               Start new game

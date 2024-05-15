@@ -35,25 +35,25 @@ const PairTheGuild = ({
   onLevelSelectDisable,
   finishedRound,
 }: Props): JSX.Element => {
-  const [submitted, setSubmitted] = useState<boolean>(false)
-  const [isCorrect, setIsCorrect] = useState<boolean>()
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+  const [isCorrect, setIsCorrect] = useState<boolean>(false)
   const [draggedGuilds, setDraggedGuilds] = useState<GuildIdCompare[]>([])
   const [tempDraggedGuild, setTempDraggedGuild] = useState<GuildIdCompare>()
   const [guildLogos, setGuildLogos] = useState<GuildBase[]>([])
   const [guildDetails, setGuildDetails] = useState<GuildBase[]>([])
 
   useEffect(() => {
-    if (!submitted) {
+    if (!isSubmitted) {
       const guilds = guildData
         ?.sort(() => Math.random() - Math.random())
         ?.slice(0, 4)
       setGuildLogos([...guilds])
       setGuildDetails([...guilds?.sort(() => Math.random() - 0.5)])
     }
-  }, [submitted])
+  }, [isSubmitted])
 
   const onSubmit = () => {
-    setSubmitted(true)
+    setIsSubmitted(true)
     const allIsCorrect = !draggedGuilds?.some(
       (guild) => guild.dragabbleGuildId !== guild.selectedGuildId
     )
@@ -73,7 +73,7 @@ const PairTheGuild = ({
   }
 
   const resetSettings = () => {
-    setSubmitted(false)
+    setIsSubmitted(false)
     setDraggedGuilds([])
     guildData = { ...guildData }
   }
@@ -87,9 +87,19 @@ const PairTheGuild = ({
     })
   }
 
+  const getFilteredGuildLogos = (): GuildBase[] =>
+    guildLogos.filter(
+      (guild) =>
+        !draggedGuilds.some(
+          (draggedGuild) => draggedGuild.dragabbleGuildId === guild.id
+        )
+    )
+
+  const getDraggedGuild = (guildId: number): GuildIdCompare =>
+    draggedGuilds?.find((logo) => logo.selectedGuildId === guildId)
+
   const handleOnDrop = (guildId) => {
-    if (draggedGuilds.some((guild) => guild.selectedGuildId === guildId)) {
-    } else {
+    if (!draggedGuilds.some((guild) => guild.selectedGuildId === guildId)) {
       setDraggedGuilds([
         ...draggedGuilds,
         { ...tempDraggedGuild, selectedGuildId: guildId },
@@ -111,24 +121,17 @@ const PairTheGuild = ({
           gap="6"
           height={"80px"}
         >
-          {!submitted ? (
+          {!isSubmitted ? (
             <>
-              {guildLogos
-                .filter(
-                  (guild) =>
-                    !draggedGuilds.some(
-                      (draggedGuild) => draggedGuild.dragabbleGuildId === guild.id
-                    )
-                )
-                .map((guild) => (
-                  <GuildLogo
-                    draggable
-                    onDragStart={(e) => handleDrag(guild)}
-                    key={guild.id}
-                    size="4rem"
-                    imageUrl={guild.imageUrl}
-                  />
-                ))}
+              {getFilteredGuildLogos().map((guild) => (
+                <GuildLogo
+                  draggable
+                  onDragStart={() => handleDrag(guild)}
+                  key={guild.id}
+                  size="4rem"
+                  imageUrl={guild.imageUrl}
+                />
+              ))}
             </>
           ) : (
             <Text as="span" fontSize="lg" fontWeight="bold" color="white">
@@ -144,7 +147,7 @@ const PairTheGuild = ({
           p="4"
           borderRadius="13px"
           border={
-            submitted
+            isSubmitted
               ? draggedGuilds.find(
                   (draggedGuild) => draggedGuild.selectedGuildId === guild.id
                 )?.dragabbleGuildId === guild.id
@@ -161,14 +164,11 @@ const PairTheGuild = ({
             onDrop={() => handleOnDrop(guild.id)}
             onDragOver={(e) => handleDragOver(e)}
           >
-            {draggedGuilds?.find((logo) => logo.selectedGuildId === guild.id) ? (
+            {getDraggedGuild(guild.id) ? (
               <GuildLogo
                 key={guild.id}
                 size="4rem"
-                imageUrl={
-                  draggedGuilds?.find((logo) => logo.selectedGuildId === guild.id)
-                    .dragabbleGuildImageUrl
-                }
+                imageUrl={getDraggedGuild(guild.id).dragabbleGuildImageUrl}
               />
             ) : (
               <Circle
@@ -178,7 +178,6 @@ const PairTheGuild = ({
                 size="4rem"
               ></Circle>
             )}
-
             <VStack
               spacing={2}
               alignItems="start"
@@ -201,7 +200,6 @@ const PairTheGuild = ({
                   {guild.name}
                 </Text>
               </HStack>
-
               <Wrap zIndex="1">
                 <Tag as="li">
                   <TagLeftIcon as={Users} />
@@ -220,7 +218,7 @@ const PairTheGuild = ({
         </Card>
       ))}
       <HStack justifyContent="center" mt="4">
-        {!submitted ? (
+        {!isSubmitted ? (
           <>
             <Button
               colorScheme="green"
