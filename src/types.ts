@@ -816,6 +816,17 @@ type DetailedPinLeaderboardUserData = {
   pins: LeaderboardPinData[]
 }
 
+export enum GameMode {
+  GuessTheGuild = "GuessTheGuild",
+  PairTheGuild = "PairTheGuild",
+}
+
+export enum GameLevel {
+  "Easy" = 100,
+  "Medium" = 500,
+  "Hard" = 1000,
+}
+
 export { ValidationMethod, Visibility, supportedEventSources, supportedSocialLinks }
 export type {
   BaseUser,

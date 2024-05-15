@@ -1,5 +1,4 @@
 import { Stack, Text } from "@chakra-ui/react"
-import { kv } from "@vercel/kv"
 import CardMotionWrapper from "components/common/CardMotionWrapper"
 import ClientOnly from "components/common/ClientOnly"
 import Layout from "components/common/Layout"
@@ -155,21 +154,9 @@ const Page = ({ leaderboard: initialData }: Props) => {
 }
 
 const getStaticProps: GetStaticProps = async () => {
-  const leaderboardTopAddresses: string[] = await kv.zrange(
-    "guildPinsLeaderboard",
-    0,
-    PAGE_SIZE - 1,
-    {
-      rev: true,
-    }
-  )
-  const leaderboard: DetailedUserLeaderboardData[] = await kv.mget(
-    ...leaderboardTopAddresses.map((address) => `guildPins:${address}`)
-  )
-
   return {
     props: {
-      leaderboard,
+      leaderboard: [],
     },
   }
 }
