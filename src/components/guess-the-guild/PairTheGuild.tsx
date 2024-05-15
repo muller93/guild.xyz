@@ -115,15 +115,13 @@ const PairTheGuild = ({
                 )
             )
             .map((guild) => (
-              <>
-                <GuildLogo
-                  draggable
-                  onDragStart={(e) => handleDrag(guild)}
-                  key={guild.id}
-                  size="4rem"
-                  imageUrl={guild.imageUrl}
-                />
-              </>
+              <GuildLogo
+                draggable
+                onDragStart={(e) => handleDrag(guild)}
+                key={guild.id}
+                size="4rem"
+                imageUrl={guild.imageUrl}
+              />
             ))}
         </HStack>
       </Center>

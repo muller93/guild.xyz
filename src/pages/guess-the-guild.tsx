@@ -14,7 +14,7 @@ import PairTheGuild from "components/guess-the-guild/PairTheGuild"
 import SelectGameLevel from "components/guess-the-guild/SelectGameLevel"
 import useLocalStorage from "hooks/useLocalStorage"
 import { Star } from "phosphor-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useSWRImmutable from "swr/immutable"
 import { GameLevel, GameMode, GuildBase } from "types"
 
@@ -30,7 +30,11 @@ const Page = (): JSX.Element => {
 
   const [selectedLevel, setSelectedLevel] = useState<GameLevel>(GameLevel.Easy)
   const [levelSelectDisable, setLevelSelectDisable] = useState<boolean>()
-  const [record, setRecord] = useLocalStorage("guess-the-guild-record", 0)
+  const [storedRecord, setStoredRecord] = useLocalStorage(
+    "guess-the-guild-record",
+    0
+  )
+  const [record, setRecord] = useState<number>(0)
   const [points, setPoints] = useState<number>(0)
 
   const title: string = gameInProgress
@@ -40,7 +44,7 @@ const Page = (): JSX.Element => {
     : "Choose a difficulty level and press the button"
 
   const onFinishedGuessTheGuildRound = (pointsReceived: number) => {
-    if (pointsReceived === 0 && record < points) setRecord(points)
+    if (pointsReceived === 0 && record < points) setStoredRecord(points)
     setPoints(pointsReceived > 0 ? points + pointsReceived : pointsReceived)
 
     setGameMode(getRandomGameMode())
@@ -48,6 +52,10 @@ const Page = (): JSX.Element => {
   const { data } = useSWRImmutable<GuildBase[]>(
     `/v2/guilds?order=FEATURED&limit=${selectedLevel}`
   )
+
+  useEffect(() => {
+    setRecord(storedRecord)
+  }, [storedRecord])
 
   const onStartGame = () => {
     setGameInProgress(true)
@@ -67,7 +75,7 @@ const Page = (): JSX.Element => {
       >
         <HStack justifyContent="space-between">
           <Text as="span" fontWeight="bold" color="white">
-            Record: {record > 0 && record}
+            Record: {record}
           </Text>
           <SelectGameLevel
             selected={selectedLevel}
@@ -92,11 +100,46 @@ const Page = (): JSX.Element => {
             {title}
           </Text>
           {gameInProgress && (
-            <Text as="span" textAlign="center" my="5" color="white">
+            <Text
+              as="span"
+              textAlign="center"
+              my="5"
+              color="white"
+              sx={{
+                "@-webkit-keyframes pulse": {
+                  "0%": {
+                    WebkitBoxShadow: `0 0 0 0 white`,
+                  },
+                  "70%": { WebkitBoxShadow: `0 0 0 0.75rem transparent` },
+                  "100%": { WebkitBoxShadow: `0 0 0 0 transparent` },
+                },
+                "@keyframes pulse": {
+                  "0%": {
+                    MozBoxShadow: `0 0 0 0 white`,
+                    boxShadow: `0 0 0 0 white`,
+                  },
+                  "70%": {
+                    MozBoxShadow: `0 0 0 0.75rem transparent`,
+                    boxShadow: `0 0 0 0.75rem transparent`,
+                  },
+                  "100%": {
+                    MozBoxShadow: `0 0 0 0 transparent`,
+                    boxShadow: `0 0 0 0 transparent`,
+                  },
+                },
+              }}
+            >
               Current points: {points}
               {points > record && (
                 <Tooltip label="New high score!">
-                  <Icon as={Star} boxSize="1.1em" weight="bold" />
+                  <Icon
+                    animation="pulse 2s infinite"
+                    borderRadius="50%"
+                    ml="3"
+                    as={Star}
+                    boxSize="1.1em"
+                    weight="bold"
+                  />
                 </Tooltip>
               )}
             </Text>

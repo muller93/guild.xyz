@@ -69,7 +69,7 @@ const GuessTheGuild = ({
 
   return (
     <>
-      <Center mt="6">
+      <Center>
         <GuildLogo size="85px" imageUrl={randomGuild.imageUrl} />
       </Center>
       <Text
