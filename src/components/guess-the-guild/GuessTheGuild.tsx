@@ -26,7 +26,7 @@ const GuessTheGuild = ({
     () =>
       [
         ...guildData
-          .filter((guild) => guild.id !== randomGuild.id)
+          ?.filter((guild) => guild.id !== randomGuild.id)
           .sort(() => Math.random() - Math.random())
           .slice(0, 3),
         randomGuild,
@@ -38,7 +38,7 @@ const GuessTheGuild = ({
     if (!showResult) {
       if (guildId === randomGuild.id) {
         setCorrectAnswerId(guildId)
-        setCorrectGuildName(guildData.find((guild) => guild.id === guildId).name)
+        setCorrectGuildName(guildData?.find((guild) => guild.id === guildId).name)
       } else {
         setCorrectAnswerId(randomGuild.id)
         setWrongAnswerId(guildId)
@@ -84,7 +84,7 @@ const GuessTheGuild = ({
       >
         {!wrongAnswerId ? correctGuildName : "Game over! Try again!"}
       </Text>
-      {possibleGuilds.map((guild) => (
+      {possibleGuilds?.map((guild) => (
         <Card
           key={guild.id}
           my="2"

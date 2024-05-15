@@ -44,15 +44,17 @@ const PairTheGuild = ({
 
   useEffect(() => {
     if (!submitted) {
-      const guilds = guildData.sort(() => Math.random() - Math.random()).slice(0, 4)
+      const guilds = guildData
+        ?.sort(() => Math.random() - Math.random())
+        ?.slice(0, 4)
       setGuildLogos([...guilds])
-      setGuildDetails([...guilds.sort(() => Math.random() - 0.5)])
+      setGuildDetails([...guilds?.sort(() => Math.random() - 0.5)])
     }
   }, [submitted])
 
   const onSubmit = () => {
     setSubmitted(true)
-    const allIsCorrect = !draggedGuilds.some(
+    const allIsCorrect = !draggedGuilds?.some(
       (guild) => guild.dragabbleGuildId !== guild.selectedGuildId
     )
     setIsCorrect(allIsCorrect)
