@@ -816,6 +816,14 @@ type DetailedPinLeaderboardUserData = {
   pins: LeaderboardPinData[]
 }
 
+type GameMode = "GuessTheGuild" | "PairTheGuild"
+
+export enum GameLevel {
+  "Easy" = 100,
+  "Medium" = 500,
+  "Hard" = 1000,
+}
+
 export { ValidationMethod, Visibility, supportedEventSources, supportedSocialLinks }
 export type {
   BaseUser,
@@ -825,6 +833,7 @@ export type {
   DiscordServerData,
   EventSources,
   EventSourcesKey,
+  GameMode,
   GitPoap,
   Group,
   Guild,
